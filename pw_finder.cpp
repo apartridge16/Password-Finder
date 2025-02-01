@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 using namespace std;
 
@@ -9,20 +10,12 @@ using namespace std;
  **************************************************/
 int main()
 {
-    ifstream inFile("rockyou.txt");
-
-    if (!inFile)
-    {
-        cerr << "Error: Could not open file.\n";
-        return 1;
-    }
+    string files[2] = {"rockyou.txt", "test.txt"};
+    const int SIZE = sizeof(files) / sizeof(files[0]);
 
     char choice = 'y';
     do
     {
-        inFile.close();
-        inFile.open("rockyou.txt");
-
         int count = 0;
         string s = "";
         string pw = "";
@@ -31,30 +24,46 @@ int main()
         cout << "\nEnter Password: ";
         cin >> pw;
 
-        while (getline(inFile, s))
+        for (int i = 0; i < SIZE; i++)
         {
-            count++;
+            ifstream inFile(files[i]);
 
-            if (s == pw)
+            if (!inFile)
             {
-                isFound = true;
+                cerr << "Error: Could not open file.\n";
+                return 1;
+            }
+
+            inFile.close();
+            inFile.open(files[i]);
+
+            while (getline(inFile, s))
+            {
+                count++;
+
+                if (s == pw)
+                {
+                    isFound = true;
+                    break;
+                }
+            }
+
+            if (isFound)
+            {
+                cout << "\n-----------------------------------------------------\n\n";
+                cout << "FOUND\n\n";
+                cout << count << ": " << pw;
+                cout << "\n\n-----------------------------------------------------\n\n";
+                break;
+            }
+            else if (!isFound && i == SIZE - 1)
+            {
+                cout << "\n-----------------------------------------------------\n\n";
+                cout << "CONGRATULATIONS, YOUR PASSWORD WASN'T FOUND";
+                cout << "\n\n-----------------------------------------------------\n\n";
                 break;
             }
         }
-
-        cout << "\n-----------------------------------------------------\n\n";
-
-        if (isFound)
-        {
-            cout << "FOUND\n\n";
-            cout << count << ": " << pw;
-        }
-        else
-        {
-            cout << "CONGRATULATIONS, YOUR PASSWORD WASN'T FOUND";
-        }
-
-        cout << "\n\n-----------------------------------------------------\n\n";
 
         cout << "Would you like to continue? (y/n): ";
         cin >> choice;
